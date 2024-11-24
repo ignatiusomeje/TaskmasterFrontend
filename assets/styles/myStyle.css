@@ -1,0 +1,306 @@
+@font-face {
+  font-family: "square";
+  src: url("./../fonts/SQR721B.woff");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "square";
+  src: url("./../fonts/Square721N.otf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "inter";
+  src: url("./../fonts/Inter-VariableFont_opsz\,wght.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --bg-kanban: #21212d;
+  --btn-color: #635fc7;
+  --bg-card: #2c2c38;
+  --text: #fff;
+  --todo-btn: #4dc7e6;
+  --done-btn: #70e3b0;
+  --text-secondary: #5e6575;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: inter;
+}
+
+.main {
+  background-image: url("../images/mainbg.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-color: black;
+  height: 100vh;
+  width: 100%;
+  color: var(--text);
+}
+
+.container {
+  width: 100%;
+  max-width: 72rem;
+  margin: auto;
+}
+
+.myHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+}
+
+.brandName {
+  color: var(--text);
+  font-size: 1.75rem;
+  font-family: square;
+  cursor: pointer;
+}
+
+.navlinks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.navlinks p {
+  color: var(--text);
+  font-weight: 900;
+  font-family: square;
+  font-size: 1rem;
+}
+
+#link1 {
+  background: linear-gradient(#2d2b69, #036c86);
+  background: linear-gradient(#12cdfc, #024a5c);
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+#link1:hover,
+#link1:focus {
+  transition: all 500ms ease-in-out;
+  color: #63d6f3;
+}
+
+#link2 {
+  background: linear-gradient(#635fc7, 
+  #0f0d5f);
+  background: linear-gradient(#6a66d3, 
+  #3b36d3);
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+}
+
+#link2:hover,
+#link2:focus {
+  background-color: var(--text);
+  transition: all 500ms ease-in-out;
+  color: #8484e2;
+}
+.section2 {
+  text-align: left;
+  
+}
+
+.CTA {
+  padding: 10% 2rem;
+}
+
+.section2 span {
+  display: block;
+}
+
+.greet {
+  font-size: 25px;
+  font-family: square;
+  font-weight: 700;
+}
+
+.brandMsg {
+  display: block;
+  color: var(--text);
+  font-size: 2rem;
+  font-family: square;
+  padding: 1rem 0;
+}
+
+b {
+  color: var(--done-btn);
+}
+
+.subhead {
+  font-size: 1.5rem;
+  color: var(--text);
+  padding: 1rem 0 2rem;
+  font-family: cursive;
+}
+
+.lowerMplan {
+  color: var(--todo-btn);
+  font-size: 1.5rem;
+  font-family: square;
+}
+
+#CTA-Btn {
+  background: linear-gradient(#0a084e, #036c86);
+  color: var(--text);
+  height: 2.75rem;
+  padding: 0 1.25rem;
+  border: none;
+  border-radius: 15px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 500ms ease-in-out;
+  cursor: pointer;
+}
+
+#CTA-Btn:hover,
+#CTA-Btn:focus {
+  background: linear-gradient(to left, #1f18e6, #01c4f5);
+}
+
+@media (max-width: 768px) {
+  .brandName {
+    font-size: 1.5rem;
+  }
+
+  .navlinks {
+    gap: 1.5rem;
+  }
+
+  #link1,
+  #link2 {
+    padding: 0.4rem 1rem;
+    font-size: .9rem;
+  }
+
+  .CTA {
+    padding: 10% 2rem;
+  }
+
+  .brandMsg {
+    font-size: 1.6rem;
+  }
+
+  .greet {
+    font-size: 1.4rem;
+  }
+
+  .subhead {
+    font-size: 1.2rem;
+  }
+
+  #CTA-Btn {
+    height: 2.5rem;
+  }
+}
+
+@media (max-width: 550px) {
+  .myHeader {
+    padding: 1rem;
+  }
+
+  .brandName {
+    font-size: 1.25rem;
+  }
+
+  .navlinks {
+    gap: 1rem;
+  }
+
+  #link1,
+  #link2 {
+    font-size: 0.8rem;
+  }
+
+  .section2 {
+    text-align: center;
+  }
+
+  .CTA {
+    padding: 12% 1rem;
+  }
+
+  .brandMsg {
+    font-size: 1.4rem;
+  }
+
+  .greet{
+    font-size: 1.2rem;
+  }
+
+  .lowerMplan {
+    font-size: 1.2rem;
+  }
+
+  #CTA-Btn {
+    height: 2rem;
+    font-size: .85rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .myHeader {
+    padding: .5rem 1rem;
+  }
+
+  .brandName {
+    font-size: 1rem;
+  }
+
+  .navlinks {
+    gap: .5rem;
+  }
+
+  #link1,
+  #link2 {
+    font-size: 0.75rem;
+    padding: .35rem .8rem;
+  }
+
+  .CTA {
+    padding: 18% 1rem;
+  }
+
+  .brandMsg {
+    font-size: 1rem;
+  }
+
+  .greet{
+    font-size: 1rem;
+    font-family: square;
+  }
+
+  .subhead {
+    font-size: 1rem;
+  }
+
+  .lowerMplan {
+    font-size: 1rem;
+  }
+
+  #CTA-Btn {
+    height: 1.8rem;
+    font-size: .75rem;
+  }
+}

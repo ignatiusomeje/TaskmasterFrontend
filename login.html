@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>M-PLAN Login</title>
+    <link rel="stylesheet" href="assets/styles/user.css" />
+  </head>
+  <body>
+    <section id="container">
+      <div class="loginCard">
+        <h3 id="head" class="headtext">Log in</h3>
+        <form id="loginForm">
+          <div class="inputContainer">
+            <div class="input_wrapper">
+              <input
+                type="email"
+                name="email"
+                id="email2"
+                placeholder="Email"
+                required
+              />
+            </div>
+
+            <div id="passEye">
+              <input
+                type="password"
+                id="password"
+                placeholder="Password"
+                name="password"
+                required
+              />
+              <span id="img-span">
+                <img
+                  src="assets/images/icons8_eye_2.svg"
+                  id="toggleIcon"
+                  alt="Toggle-icon"
+                />
+              </span>
+            </div>
+          </div>
+
+          <button id="loginBtn" type="submit">Log In</button>
+
+          <p id="no-Account">
+            Don't have an account?
+            <a href="signUp.html" id="create-Account">Create Account</a>
+          </p>
+
+          <span class="returnNav">
+            <a href="index.html"
+              ><img
+                src="assets/images/icons8_left_2.svg"
+                id="returnIcon"
+                alt="Left icon"
+            /></a>
+            <p id="forgotten">Forgotten Password?</p>
+          </span>
+        </form>
+      </div>
+    </section>
+    <script src="./assets/js/sweetalert2@11.js"></script>
+    <script src="./assets/js/axios.min.js"></script>
+    <script src="assets/js/user.js"></script>
+  </body>
+</html>

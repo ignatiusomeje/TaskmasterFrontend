@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>M-PLAN Sign Up</title>
+    <link rel="stylesheet" href="Assets/styles/sweetalert2.min.css" />
+    <link rel="stylesheet" href="assets/styles/user.css" />
+  </head>
+  <body>
+    <section id="container">
+      <div id="signUpCard">
+        <h3 id="head2">Create an account</h3>
+        <form action="" id="signUpForm">
+          <div class="inputContainer2">
+            <div class="input_wrapper">
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                placeholder="First Name"
+                required
+              />
+            </div>
+            <div class="input_wrapper">
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                placeholder="Last Name"
+                required
+              />
+            </div>
+            <div class="input_wrapper">
+              <input
+                type="email"
+                name="email"
+                id="email2"
+                placeholder="Email"
+                required
+              />
+            </div>
+            <div id="passEye">
+              <input
+                type="password"
+                id="password"
+                placeholder="Password"
+                name="password"
+                required
+              />
+              <span id="img-span">
+                <img
+                  src="assets/images/icons8_eye_2.svg"
+                  id="toggleIcon"
+                  alt="Toggle-icon"
+                />
+              </span>
+            </div>
+            <div id="confirmPassEye">
+              <input
+                type="password"
+                id="confirm"
+                placeholder="Confirm password"
+                name="confirmPassword"
+                required
+              />
+              <span id="img-span">
+                <img
+                  src="assets/images/icons8_eye_2.svg"
+                  id="toggleIconConfirmPass"
+                  alt="Toggle-icon"
+                />
+              </span>
+            </div>
+          </div>
+          <button type="submit" id="signUpBtn">Sign Up</button>
+
+          <span class="returnNav">
+            <a href="login.html"
+              ><img
+                src="assets/images/icons8_left_2.svg"
+                id="returnIcon"
+                alt="Left icon"
+            /></a>
+
+            <p id="have-Account">
+              Already have account?
+              <a href="login.html" id="loginLink">Log In</a>
+            </p>
+          </span>
+        </form>
+      </div>
+    </section>
+    <script src="./assets/js/sweetalert2@11.js"></script>
+    <script src="./assets/js/axios.min.js"></script>
+    <script src="assets/js/user.js"></script>
+  </body>
+</html>
