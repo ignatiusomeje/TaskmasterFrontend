@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="Assets/styles/sweetalert2.min.css" />
     <link rel="stylesheet" href="./assets/styles/style.css" />
-    <link rel="stylesheet" href="assets/styles/icofont/icofont.min.css" />
+    <link rel="stylesheet" href="./assets/styles/icofont/icofont.min.css" />
     <title>M-Plan Todo</title>
   </head>
   <body>
@@ -32,7 +33,7 @@
                 id="searchIcon"
               />
 
-              <input type="search" placeholder="search task" id="searchInput" />
+              <input name="title" type="search" placeholder="search task" id="searchInput" />
               <div class="filter-container">
                 <!-- <button type="button" id="filterButton" class="filter-btn">
                   Filter
@@ -43,9 +44,10 @@
                   id="filterIcon"
                 />
                 <ul id="filterDropdown" class="dropdown hidden">
-                  <li id="filterDropdown_btn">Low</li>
-                  <li id="filterDropdown_btn">Medium</li>
-                  <li id="filterDropdown_btn">High</li>
+                  <li class="filterDropdown_btn">All</li>
+                  <li class="filterDropdown_btn">Low</li>
+                  <li class="filterDropdown_btn">Medium</li>
+                  <li class="filterDropdown_btn">High</li>
                 </ul>
               </div>
             </span>
@@ -56,7 +58,8 @@
       <div class="todo_area">
         <div class="todo_area_column">
           <h6 class="todo">TODO<span id="todoTotal"></span></h6>
-          <div id="todoColumn" class="todos_column"></div>
+          <div id="todoColumn" class="todos_column">
+          </div>
         </div>
         <div class="todo_area_column">
           <h6 class="doing">DOING<span id="doingTotal"></span></h6>
@@ -79,11 +82,12 @@
             </div>
             <div class="form_input">
               <label for="description">Description</label>
-              <input name="description" type="text" required />
-            </div>
-            <div class="form_input">
-              <label for="">Title</label>
-              <input name="title" type="text" required />
+              <textarea
+                name="description"
+                rows="3"
+                required
+                style="resize: none"
+              ></textarea>
             </div>
             <div class="form_input">
               <label for="deadline">Deadline</label>
@@ -106,17 +110,55 @@
     <div id="modalBoard" class="modal">
       <div id="modalContainerBoard" class="modal-container">
         <div class="modal-form">
-          <h3>Create new board</h3>
+          <h3>Edit Task</h3>
           <form action="" id="boardForm">
+            <div class="form_input">
+              <label for="title">Title</label>
+              <input name="title" type="text" required />
+            </div>
+            <div class="form_input">
+              <label for="description">Description</label>
+              <textarea
+                name="description"
+                rows="3"
+                required
+                style="resize: none"
+              ></textarea>
+            </div>
+            <div class="form_input">
+              <label for="deadline">Deadline</label>
+              <input name="deadline" type="datetime-local" required />
+            </div>
+            <div class="form_input">
+              <label for="priority">Priority</label>
+              <select name="priority" id="priority" required>
+                <option value="" default>Select the Task priority</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div class="form_input" style="display: none;">
+              <label for="id">id</label>
+              <input name="id" type="text" />
+            </div>
+            <div class="form_input" style="display: none;">
+              <label for="status">status</label>
+              <input name="status" type="text" />
+            </div>
+            <button type="submit">Update Task</button>
+          </form>
+          <!-- <form action="" id="boardForm">
             <div class="form_input">
               <label for="">Title</label>
               <input name="boardName" type="text" />
             </div>
             <button type="submit">Create New Board</button>
-          </form>
+          </form> -->
         </div>
       </div>
     </div>
+    <script src="./assets/js/sweetalert2@11.js"></script>
     <script src="./assets/js/axios.min.js"></script>
     <script src="./assets/js/dashboard.js"></script>
   </body>

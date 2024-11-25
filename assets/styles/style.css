@@ -306,20 +306,67 @@ main {
   /* border: 1px solid red; */
 }
 
+.low{
+  background-color: #DFFFD6;
+  color: #2D6A4F;
+}
+
+.medium{
+  background-color: #FFF4CC;
+  color: #D97706;
+}
+
+.high{
+  background-color: #FFCDD2;
+  color: #B71C1C;
+}
+
 .todo_area .todo_row {
-  padding: 1.3rem 1rem;
+  /* padding: 1.3rem 1rem; */
+  overflow: hidden;
   background-color: var(--bg-card);
   border-radius: 1rem;
   color: var(--text);
-  padding-bottom: 2rem;
-  position: relative;
-  border: 1px solid yellow;
+  /* padding-bottom: .7rem; */
+  /* position: relative; */
+  border: 1px solid;
   display: flex;
-  align-items: center;
+  gap:1rem;
+  flex-direction: column;
+  /* align-items: center; */
   justify-content: space-between;
   width: 100%;
   text-transform: capitalize;
   user-select: none;
+}
+
+.todo_area .todoHeader {
+  display: flex;
+  padding: .4rem 1rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.todo_area .btnTask {
+  padding: .4rem 1rem;
+  color: inherit;
+  background-color: inherit;
+  border: none;
+  cursor: pointer;
+  &:hover{
+    scale: 1.05;
+  }
+}
+
+.todo_area .taskFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .4rem 1rem;
+}
+
+.todo_area .taskDesc {
+  padding: .4rem 1rem;
 }
 
 .todo_area .todo_row p {
@@ -340,8 +387,8 @@ main {
 }
 
 .todo_area .todo_row .icofont-ui-delete {
-  color: red;
-  position: absolute;
+  /* color: red; */
+  /* position: absolute; */
   bottom: 13px;
   right: 0;
   margin-right: 1rem;
@@ -408,10 +455,13 @@ main {
 }
 
 .modal .modal-container .modal-form .form_input input,
-.modal .modal-container .modal-form .form_input select {
+.modal .modal-container .modal-form .form_input select, .modal .modal-container .modal-form .form_input textarea {
   padding: 0.4rem;
   border-radius: 0.5rem;
   font-size: 18px;
+  background-color: var(--bg-kanban);
+  border-color: var(--bg-kanban);
+  color: var(--text);
 }
 
 .modal .modal-container .modal-form .form_input select {
@@ -419,7 +469,7 @@ main {
 }
 
 .modal .modal-container .modal-form .form_input input:focus,
-.modal .modal-container .modal-form .form_input select:focus {
+.modal .modal-container .modal-form .form_input select:focus,.modal .modal-container .modal-form .form_input textarea {
   outline: none;
 }
 

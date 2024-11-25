@@ -17,6 +17,11 @@ const doneTotal = document.getElementById("doneTotal");
 const sideBarIcon = document.getElementById("sideBarIcon");
 const getSideBar = document.getElementById("asideBar");
 
+const api = axios.create({
+  baseURL: `http://localhost:3002/api/v1/`,
+  //   baseURL: `https://7l7wjdmm-3001.euw.devtunnels.ms/api/v1/`,
+});
+
 let selected = "";
 let selectedId = "";
 
@@ -28,22 +33,43 @@ addNewTodo.addEventListener("click", () => {
 //   modalBoard.classList.toggle("display");
 // });
 
+let user;
+
+getUserCredentials();
+
+function getUserCredentials() {
+  const savedCredentials = localStorage.getItem("TaskMaster");
+
+  if (savedCredentials) {
+    user = JSON.parse(savedCredentials);
+  } else {
+    return null;
+  }
+}
+
+if (!user) {
+  window.location.href = "/login.html";
+}
+
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   const task = new FormData(e.target);
-  const taskModified = {
-    title: task.get("title"),
-    status: "Todo",
-  };
-  addTaskToBoard(taskModified);
+  const taskModified = {};
+  task.forEach((value, name) => (taskModified[name] = value));
+  taskModified.status = "todo";
+  createATask(user.token, taskModified);
+  // console.log(taskModified, "see me here");
+  // // addTaskToBoard(taskModified);
   modal.classList.toggle("display");
   form.reset();
-  return displayBoards();
+  // return displayBoards();
 });
 
+const searchBar = document.getElementById("searchBar");
 const filterIcon = document.getElementById("filterIcon");
-const filterDropdown_btn = document.getElementById("filterDropdown_btn");
+const filterDropdown_btn = document.querySelectorAll(".filterDropdown_btn");
 const filterDropdown = document.getElementById("filterDropdown");
+const searchInput = document.getElementById("searchInput");
 
 // Toggle the dropdown visibility on button click
 filterIcon.addEventListener("click", () => {
@@ -60,23 +86,44 @@ window.addEventListener("click", (event) => {
   }
 });
 
-// Close the dropdown if clicking outside
-filterDropdown_btn.addEventListener("click", (event) => {
-  if (
-    !filterIcon.contains(event.target) &&
-    !filterDropdown.contains(event.target)
-  ) {
-    filterDropdown.classList.remove("show");
-  }
+// Close the dropdown if you click on any of the buttons
+filterDropdown_btn.forEach((btn) => {
+  btn.addEventListener("click", (event) => {
+    filterDropdown.classList.toggle("show");
+    searchInput.value = "";
+    if (event.target.textContent === "All") {
+      return fetchTasks(user.token);
+    }
+    fetchTasks(user.token, "priority", event.target.textContent);
+  });
 });
 
 boardForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const boardName = new FormData(e.target);
-  addToDisplayBoard(boardName.get("boardName"));
+  const task = new FormData(e.target);
+  const taskModified = {};
+  task.forEach((value, name) => (taskModified[name] = value));
+  const { title, description, deadline, priority } = taskModified;
+  updateATask(user.token, taskModified.id, {
+    title,
+    description,
+    deadline,
+    priority,
+  });
+  fetchTasks(user.token);
   modalBoard.classList.toggle("display");
   boardForm.reset();
-  return displayBoards();
+});
+
+searchBar.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const task = new FormData(e.target);
+  const taskModified = {};
+  task.forEach((value, name) => (taskModified[name] = value));
+  const { title } = taskModified;
+  fetchTasks(user.token, "title", title);
+  // modalBoard.classList.toggle("display");
+  // boardForm.reset();
 });
 
 modalContainer.addEventListener("click", (e) => {
@@ -86,6 +133,18 @@ modalContainer.addEventListener("click", (e) => {
   }
 });
 
+const alertMixin = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timerProgressBar: false,
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  },
+  timer: 3000, // Auto-close after 2 seconds
+});
+
 modalContainerBoard.addEventListener("click", (e) => {
   if (e.target.id === "modalContainerBoard") {
     modalBoard.classList.toggle("display");
@@ -93,67 +152,105 @@ modalContainerBoard.addEventListener("click", (e) => {
   }
 });
 
-function displayBoards() {
-  const boards = readLocalHost();
-  boardList.innerHTML = "";
-
-  if (boards.length > 0) {
-    boards.map((board, key) => {
-      const p = document.createElement("p");
-      const i = document.createElement("i");
-      if (selected === board.name) {
-        p.setAttribute("class", "active");
-      } else if (!selected) {
-        if (key === 0) {
-          selected = board.name;
-          p.setAttribute("class", "active");
-        }
-      }
-      i.setAttribute("class", "icofont-ghost");
-      p.append(i);
-      p.append(board.name);
-      boardNumber.textContent = `(${boards.length})`;
-      boardList.append(p);
-      p.addEventListener("click", () => {
-        selected = board.name;
-        displayBoards();
-        displayBoardTasks();
+fetchTasks(user.token);
+/* Read Tasks */
+function fetchTasks(token, queryName, queryValue) {
+  let query = api
+    .get(`/tasks${queryName ? `?${queryName}=${queryValue}` : "/"}`, {
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+    })
+    .then((value) => {
+      displayBoardTasks(value.data.message);
+    })
+    .catch((err) => {
+      alertMixin.fire({
+        icon: "error",
+        title: "Error Fetching Tasks",
+        text: err?.response?.data?.message || err.message,
       });
     });
-  }
+}
+/* Create a task */
+function createATask(token, task) {
+  api
+    .post("/tasks", JSON.stringify(task), {
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+    })
+    .then(() => {
+      alertMixin.fire({
+        icon: "success",
+        title: "Task Created",
+        text: "Tasks created successfully",
+      });
+      fetchTasks(token);
+    })
+    .catch((err) => {
+      alertMixin.fire({
+        icon: "error",
+        title: "Error Creating Task",
+        text: err?.response?.data?.message || err.message,
+      });
+    });
+}
+/* Update a Task */
+function updateATask(token, id, task) {
+  api
+    .put(`/tasks/${id}`, JSON.stringify(task), {
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+    })
+    .then((value) => {
+      alertMixin.fire({
+        icon: "success",
+        title: "Task Updated",
+        text: `Task Updated Successfully`,
+      });
+      fetchTasks(token);
+      // displayBoardTasks(value.data.message);
+    })
+    .catch((err) => {
+      alertMixin.fire({
+        icon: "error",
+        title: "Error Creating Task",
+        text: err?.response?.data?.message || err.message,
+      });
+    });
+}
+/* Delete a task */
+function deleteATask(token, id) {
+  api
+    .delete(`/tasks/${id}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    })
+    .then((value) => {
+      alertMixin.fire({
+        icon: "success",
+        title: "Task deleted",
+        text: `Task deleted Successfully`,
+      });
+      fetchTasks(token);
+    })
+    .catch((err) => {
+      alertMixin.fire({
+        icon: "error",
+        title: "Error Creating Task",
+        text: err?.response?.data?.message || err.message,
+      });
+    });
 }
 
-displayBoards();
-
-function addToDisplayBoard(boardName) {
-  const boards = readLocalHost();
-  const id = Math.floor(Math.random() * 1000000);
-
-  const newBoard = {
-    id,
-    name: boardName,
-    tasks: [],
-  };
-
-  if (boards.length === 0) {
-    const newBoards = [...boards, newBoard];
-    writeToLocalHost(newBoards);
-    selected = boardName;
-    displayBoards();
-    return displayBoardTasks();
-  }
-
-  selected = boardName;
-
-  const newBoards = [newBoard, ...boards];
-  writeToLocalHost(newBoards);
-  displayBoards();
-  return displayBoardTasks();
-}
-
-function displayBoardTasks() {
-  const column = readLocalHost().find((column) => column.name === selected);
-  const tasks = column.tasks;
+function displayBoardTasks(Tasks) {
+  const tasks = Tasks;
   doingColumn.innerHTML = "";
   doneColumn.innerHTML = "";
   todoColumn.innerHTML = "";
@@ -197,8 +294,6 @@ function displayBoardTasks() {
   }
 }
 
-displayBoardTasks();
-
 function createDropzone() {
   const range = document.createRange();
   range.selectNode(document.body);
@@ -222,189 +317,115 @@ function createDropzone() {
     const columnElement = dropZone.closest(".todos_column");
     const columnName =
       columnElement.id && columnElement.id === "doingColumn"
-        ? "Doing"
+        ? "doing"
         : columnElement.id === "doneColumn"
-        ? "Done"
-        : columnElement.id === "todoColumn" && "Todo";
-    const dropZonesInColumn = Array.from(
-      columnElement.querySelectorAll(".dropzone")
-    );
-    const droppedIndex = dropZonesInColumn.indexOf(dropZone);
-    const itemId = Number(e.dataTransfer.getData("text/plain"));
-    updateItems(itemId, { status: columnName, position: droppedIndex });
-    displayBoardTasks();
+        ? "done"
+        : columnElement.id === "todoColumn" && "todo";
+    const item = JSON.parse(e.dataTransfer.getData("text/plain"));
+    item.status = columnName;
+
+    updateATask(user.token, item._id, item);
+    fetchTasks(user.token);
   });
 
   return dropZone;
 }
 
-function createTaskElementMethod(text, column) {
+function createTaskElementMethod(task, column) {
   const div = document.createElement("div");
   const dropZone = createDropzone();
 
   div.setAttribute("class", "todo_row");
   div.addEventListener("dragstart", (e) => {
-    e.dataTransfer.setData("text/plain", text.id);
+    e.dataTransfer.setData("text/plain", JSON.stringify(task));
   });
   div.draggable = true;
-  const p = document.createElement("p");
-  p.textContent = text.title;
-  p.contentEditable = true;
-  p.addEventListener("drop", (e) => e.preventDefault());
-  p.addEventListener("blur", (e) => {
-    const oldItem = text.title;
+  div.innerHTML = `
+              <div class="todoHeader ${
+                task.priority === "low"
+                  ? `low`
+                  : task.priority === "medium"
+                  ? `medium`
+                  : `high`
+              }">
+                <span>${task.title}</span>
+                <span class="icofont-ui-delete"></span>
+              </div>
+              <p class="taskDesc">
+                ${task.description}
+              </p>
+              <div class="taskFooter ${
+                task.priority === "low"
+                  ? `low`
+                  : task.priority === "medium"
+                  ? `medium`
+                  : `high`
+              }">
+                <span>due: ${new Date(
+                  task.deadline
+                ).toLocaleDateString()}</span>
+                <button type="button" class="btnTask">Edit</button>
+              </div>
+            `;
+  const TaskToDelete = div.querySelector(".icofont-ui-delete");
+  TaskToDelete.addEventListener("click", () => {
+    deleteATask(user.token, task._id);
+  });
+  const edit = div.querySelector(".btnTask");
+  edit.addEventListener("click", () => {
+    const title = boardForm.querySelector("[name=title]");
+    const description = boardForm.querySelector("[name=description]");
+    const deadline = boardForm.querySelector("[name=deadline]");
+    const id = boardForm.querySelector("[name=id]");
+    const priority = boardForm.querySelector("[name=priority]");
+    const status = boardForm.querySelector("[name=status]");
+    title.value = task.title;
+    description.value = task.description;
+    deadline.value = new Date(task.deadline).toISOString().slice(0, 16);
+    id.value = task._id;
+    priority.value = task.priority;
+    status.value = task.status;
+    modalBoard.classList.toggle("display");
+  });
+  div.addEventListener("drop", (e) => e.preventDefault());
+  // p.addEventListener("blur", (e) => {
+  //   const oldItem = text.title;
 
-    if (oldItem !== p.textContent) {
-      updateItems(text.id, { content: p.textContent });
-      const allItem = readLocalHost();
-      const item = allItem.find((column) =>
-        column.tasks.find((task) => task.id === text.id)
-      );
-      const toBeUpdated = item.tasks.filter((task) => task.id === text.id);
-      toBeUpdated[0].title = p.textContent;
-      writeToLocalHost(allItem);
-      displayBoardTasks();
-    }
-  });
-  div.append(p);
-  const span = document.createElement("span");
-  span.setAttribute("class", "icofont-ui-delete");
-  span.addEventListener("click", () => {
-    const allBoard = readLocalHost();
-    const boardFetched = allBoard.filter((file) => file.name === selected);
-    boardFetched[0].tasks = boardFetched[0].tasks.filter(
-      (task) => task.title !== text.title && task.id !== text.id
-    );
-    writeToLocalHost(allBoard);
-    displayBoardTasks();
-  });
-  div.append(span);
+  //   if (oldItem !== p.textContent) {
+  //     updateItems(text.id, { content: p.textContent });
+  //     const allItem = readLocalHost();
+  //     const item = allItem.find((column) =>
+  //       column.tasks.find((task) => task.id === text.id)
+  //     );
+  //     const toBeUpdated = item.tasks.filter((task) => task.id === text.id);
+  //     toBeUpdated[0].title = p.textContent;
+  //     writeToLocalHost(allItem);
+  //     displayBoardTasks();
+  // }
+  // });
+  // div.append(p);
+  // const span = document.createElement("span");
+  // span.setAttribute("class", "icofont-ui-delete");
+  // span.addEventListener("click", () => {
+  //   const allBoard = readLocalHost();
+  //   const boardFetched = allBoard.filter((file) => file.name === selected);
+  //   boardFetched[0].tasks = boardFetched[0].tasks.filter(
+  //     (task) => task.title !== text.title && task.id !== text.id
+  //   );
+  //   writeToLocalHost(allBoard);
+  //   displayBoardTasks();
+  // });
+  // div.append(span);
   column.append(div);
   column.append(dropZone);
 }
 
-function updateItems(itemId, newProp) {
-  const allItem = readLocalHost();
-  debugger;
-  const item = allItem.find((column) =>
-    column.tasks.find((task) => task.id === itemId)
-  );
-
-  if (item) {
-    const needed = item.tasks.filter((task) => task.id === itemId);
-    if ((newProp.position === 0 || newProp.position) && newProp.status) {
-      // const reversed = item.tasks.reverse()
-      const arrangedTodo = item.tasks.filter(
-        (task) => task.status === newProp.status
-      );
-      if (arrangedTodo[newProp.position] !== undefined) {
-        const indexOfItemAfterLanding = arrangedTodo.findIndex(
-          (task) => task.id === arrangedTodo[newProp.position].id
-        );
-        const arrayOfOld = arrangedTodo[indexOfItemAfterLanding];
-        const biggerArrayIndex = item.tasks.findIndex(
-          (task) => task.id === arrayOfOld.id
-        );
-        // done
-        const indexNewArray = item.tasks.findIndex(
-          (task) => task.id === itemId
-        );
-        arrangedTodo.splice(biggerArrayIndex, 1);
-        needed[0].status = newProp.status ? newProp.status : needed[0].status;
-
-        arrangedTodo.splice(indexNewArray, 0, needed[0]);
-      } else {
-        const indexNewArray = item.tasks.findIndex(
-          (task) => task.id === itemId
-        );
-        needed[0].status = newProp.status ? newProp.status : needed[0].status;
-        arrangedTodo.splice(indexNewArray, 0, needed[0]);
-      }
-      return writeToLocalHost(allItem);
-    }
-  }
-
-  // 1:21:49
-}
-
-function addTaskToBoard(task) {
-  const allBoard = readLocalHost();
-  const boardFetched = allBoard.filter((file) => file.name === selected);
-  const newBody = {
-    id: Math.floor(Math.random() * 1000000),
-    title: task.title,
-    status: task.status,
-  };
-
-  if (boardFetched.length > 0 || boardFetched.length === 0) {
-    boardFetched[0].tasks.push(newBody);
-    writeToLocalHost(allBoard);
-    displayBoardTasks();
-  }
-}
-
-function getColumnItems(id, status) {
-  const items = readLocalHost().find((column) => {
-    if (column.id === id) {
-      return column.tasks.find((task) => task.status === status);
-    }
-  });
-
-  if (!items) {
-    return [];
-  }
-
-  return items;
-}
-
-function insertItem(id, content) {
-  const items = readLocalHost();
-
-  const column = items.find((column) => column.id === id);
-
-  if (!column) {
-    throw new Error("Invalid Column");
-  }
-
-  column.tasks.push(content);
-
-  writeToLocalHost(items);
-}
-
-function readLocalHost() {
-  const data = localStorage.getItem("m-plan-data");
-
-  if (!data) {
-    return [];
-  }
-
-  return JSON.parse(data);
-}
-
-function writeToLocalHost(data) {
-  localStorage.setItem("m-plan-data", JSON.stringify(data));
-}
-
-/* 
-[{
-  id:number
-  name:string,
-  tasks:[
-  {
-    id:number,
-    title:string,
-    status:number[0=todo,1=doing,2=done]
-  }
-  ]
-}]
-*/
-
-// SIDEBAR TOGGLE FUNCTION
-getSideBar.style.display = "none";
-sideBarIcon.addEventListener("click", () => {
-  if ((getSideBar.style.display = "none")) {
-    getSideBar.style.display = "block";
-  } else {
-    getSideBar.style.display = "none";
-  }
-});
+// // SIDEBAR TOGGLE FUNCTION
+// getSideBar.style.display = "none";
+// sideBarIcon.addEventListener("click", () => {
+//   if ((getSideBar.style.display = "none")) {
+//     getSideBar.style.display = "block";
+//   } else {
+//     getSideBar.style.display = "none";
+//   }
+// });
