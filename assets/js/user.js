@@ -27,7 +27,8 @@ toggleIconConfirmPass?.addEventListener("click", () => {
 });
 
 const api = axios.create({
-  baseURL: `http://localhost:3002/api/v1/`,
+  // baseURL: `http://localhost:3002/api/v1/`,
+  baseURL: `https://taskmaster-tauu.onrender.com/api/v1`,
   //   baseURL: `https://7l7wjdmm-3001.euw.devtunnels.ms/api/v1/`,
 });
 
