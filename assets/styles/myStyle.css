@@ -131,9 +131,11 @@ a {
 }
 
 .greet {
-  font-size: 25px;
-  font-family: square;
-  font-weight: 700;
+  font-size: 12px;
+  font-family: inter;
+  max-width: 500px;
+  width: 100%;
+  font-weight: 400;
 }
 
 .brandMsg {
@@ -199,7 +201,7 @@ b {
   }
 
   .brandMsg {
-    font-size: 1.6rem;
+    font-size: 2rem;
   }
 
   .greet {
